@@ -1,0 +1,68 @@
+--- 
+ - hosts: application
+   become: true
+   
+   tasks:
+   - name: update repository index for  UBUNTU
+     when: ansible_distribution == "Ubuntu"     
+     apt:
+       update_cache: yes 
+       state: latest
+
+   - name: install apache2  UBUNTU
+     when: ansible_distribution == "Ubuntu"
+     apt:
+       name: apache2
+       
+       state: latest
+
+
+   - name: install php and dependencies for ubuntu
+     when: ansible_distribution == "Ubuntu"
+     apt:
+       name: libapache2-mod-php
+       state: latest
+
+   - name: update repository index for RHEL
+     when: ansible_distribution == "RedHat"
+     yum:
+       update_cache: yes 
+       state: latest 
+
+   - name: install apache2  RHEL
+     when: ansible_distribution == "RedHat"
+     yum:
+       name: httpd
+       state: latest
+
+   - name: install php and dependencies for Redhat
+     when: ansible_distribution == "RedHat"
+     yum:
+       name: php
+       state: latest
+       
+ - hosts: db
+   become: true
+   
+   tasks:
+   - name: update repository index for  UBUNTU
+     when: ansible_distribution == "Ubuntu"     
+     apt:
+       update_cache: yes 
+       state: latest
+
+   - name: update repository index for RHEL
+     when: ansible_distribution == "RedHat"
+     yum:
+       update_cache: yes 
+       state: latest 
+
+   - name: install maria db for Ubuntu
+     when: ansible_distribution == "Ubuntu"
+     apt:
+       name: mariadb-server
+
+   - name: install maria db for Redhat
+     when: ansible_distribution == "RedHat"
+     yum:
+       name: mariadb-server

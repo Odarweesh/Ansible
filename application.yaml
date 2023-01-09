@@ -1,0 +1,44 @@
+--- 
+ - hosts: application
+   become: true
+   
+   tasks:
+
+   - name: update repo install apache2 and php  UBUNTU
+     when: ansible_distribution == "Ubuntu"
+     tags: application_ubuntu,application
+     apt:
+       name: 
+       - apache2
+       - libapache2-mod-php 
+       update_cache: yes
+       state: latest
+
+   - name: update repo install apache2 and php  RHEL
+     when: ansible_distribution == "RedHat"
+     tags: application_Redhat,application
+     yum:
+       name: 
+       - httpd
+       - php
+       state: latest
+       update_cache: yes
+     
+ - hosts: db
+   become: true
+   
+   tasks:
+
+   - name: update Repo and install maria db for Ubuntu
+     when: ansible_distribution == "Ubuntu"
+     tags: db_ubuntu,db
+     apt:
+       name: mariadb-server
+       update_cache: yes
+
+   - name: update repo and install maria db for Redhat
+     when: ansible_distribution == "RedHat"
+     tags: db_redhat,db
+     yum:
+       name: mariadb-server
+       update_cache: yes
