@@ -1,0 +1,76 @@
+--- 
+ - hosts: application
+   become: true
+   
+   tasks:
+
+   - name: update repo install apache2 and php  UBUNTU
+     when: ansible_distribution == "Ubuntu"
+     tags: application_ubuntu,application
+     apt:
+       name: 
+       - apache2
+       - libapache2-mod-php 
+       update_cache: yes
+       state: latest
+
+   - name: update repo install apache2 and php  RHEL
+     when: ansible_distribution == "RedHat"
+     tags: application_Redhat,application
+     yum:
+       name: 
+       - httpd
+       - php
+       state: latest
+       update_cache: yes
+   
+
+   - name: enabled mod_rewrite
+     apache2_module: name=rewrite state=present
+     notify:
+        - restart apache
+
+   - name: apache2 listen on port 8081
+     lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen 80" line="Listen 8081" state=present
+     notify:
+        - restart apache
+
+   - name: apache2 virtualhost on port 8081
+     lineinfile: dest=/etc/apache2/sites-available/000-default.conf regexp="^<VirtualHost \*:80>" line="<VirtualHost *:8081>" state=present
+     notify:
+        - restart apache  
+   
+
+   handlers:
+   
+   - name: restart apache 
+     when: ansible_distribution == "RedHat"
+     service:
+            name: httpd
+            state: restarted
+
+   - name: restart apache 
+     when: ansible_distribution == "Ubuntu"
+     service:
+            name: apache2
+            state: restarted
+
+
+ - hosts: db
+   become: true
+   
+   tasks:
+
+   - name: update Repo and install maria db for Ubuntu
+     when: ansible_distribution == "Ubuntu"
+     tags: db_ubuntu,db
+     apt:
+       name: mariadb-server
+       update_cache: yes
+
+   - name: update repo and install maria db for Redhat
+     when: ansible_distribution == "RedHat"
+     tags: db_redhat,db
+     yum:
+       name: mariadb-server
+       update_cache: yes
